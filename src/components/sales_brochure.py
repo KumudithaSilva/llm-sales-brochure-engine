@@ -1,12 +1,13 @@
-from utils import base_utils
+from infrastructure.dotenv import DotEnvLoader
+from infrastructure.openai_provider import OpenAIApiKeyProvider
 
 class SalesBrochure:
     
     def __init__(self):
-        self.utils = base_utils.BaseUtils()
-        self.env_variables = self.utils.load_env_variables()
+        self.env_loader = DotEnvLoader()
+        self.api_key_provider = OpenAIApiKeyProvider(self.env_loader)
 
 
 if __name__ == "__main__":
     sales_brochure = SalesBrochure()
-    print(sales_brochure.env_variables)
+    print(sales_brochure.api_key_provider.get_api_key())
