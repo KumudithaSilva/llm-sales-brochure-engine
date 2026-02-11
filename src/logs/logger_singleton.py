@@ -58,7 +58,7 @@ class Logger(BaseLogger):
 
         # Create formater and add it to both handlers
         formater = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+             "%(asctime)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s"
         )
         file_handler.setFormatter(formater)
         console_handler.setFormatter(formater)
@@ -68,16 +68,16 @@ class Logger(BaseLogger):
         self._logger.addHandler(console_handler)
 
     def debug(self, message: str):
-        self._logger.debug(message)
+        self._logger.debug(message, stacklevel=2)
 
     def info(self, message: str):
-        self._logger.info(message)
+        self._logger.info(message, stacklevel=2)
 
     def warning(self, message: str):
-        self._logger.warning(message)
+        self._logger.warning(message, stacklevel=2)
 
     def error(self, message: str):
-        self._logger.error(message)
+        self._logger.error(message, stacklevel=2)
 
     def critical(self, message: str):
-        self._logger.critical(message)
+        self._logger.critical(message, stacklevel=2)
