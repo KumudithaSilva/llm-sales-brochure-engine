@@ -1,12 +1,15 @@
 import os
+
 from interfaces.i_api_key_provider import IApiKeyProvider
 from interfaces.i_env_loader import IEnvLoader
 from logs.logger_singleton import Logger
 
+
 class OpenAIApiKeyProvider(IApiKeyProvider):
     """
-    Provider for OpenAI API keys, loading from environment variables.   
+    Provider for OpenAI API keys, loading from environment variables.
     """
+
     def __init__(self, env_loader: IEnvLoader, logger=None):
         """
         Initialize the OpenAIApiKeyProvider instance.
@@ -19,7 +22,7 @@ class OpenAIApiKeyProvider(IApiKeyProvider):
         """
         self.env_loader = env_loader
         self.logger = logger or Logger(self.__class__.__name__)
-    
+
     def get_api_key(self) -> str:
         """
         Load and validate the OpenAI API key from environment variables.
