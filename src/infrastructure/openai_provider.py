@@ -4,32 +4,45 @@ from interfaces.i_env_loader import IEnvLoader
 from logs.logger_singleton import Logger
 
 class OpenAIApiKeyProvider(IApiKeyProvider):
-    def __init__(self, env_loader: IEnvLoader):
+    """
+    Provider for OpenAI API keys, loading from environment variables.   
+    """
+    def __init__(self, env_loader: IEnvLoader, logger=None):
         """
-        Initialize the DotEnvLoader class and configure the logger.
+        Initialize the OpenAIApiKeyProvider instance.
+
+        Args:
+            env_loader (IEnvLoader): An environment loader instance used
+                to load environment variables.
+            logger (Logger, optional): A logger instance. If None, a
+                default logger is created using the class name.
         """
         self.env_loader = env_loader
-        self.logger = Logger(self.__class__.__name__)
+        self.logger = logger or Logger(self.__class__.__name__)
     
     def get_api_key(self) -> str:
         """
         Load and validate the OpenAI API key from environment variables.
 
         Returns:
-            str: The OpenAI API key if valid.
+            str: The valid OpenAI API key.
 
         Raises:
             EnvironmentError: If the API key is missing or invalid.
         """
+        # Load environment variables
         self.env_loader.load_env_variables()
-        api_key = os.getenv('OPENAI_API_KEY')
-         
+
+        # Fetch the API key
+        api_key = os.getenv("OPENAI_API_KEY")
+
         if not api_key:
             self.logger.error("Error: OPENAI_API_KEY not set")
             raise EnvironmentError("OPENAI_API_KEY not set")
-         
+
         if api_key.startswith("sk-proj-"):
             self.logger.info("OpenAI API key found and validated")
             return api_key
+
         self.logger.error("Invalid OpenAI API key format")
         raise EnvironmentError("Invalid OpenAI API key format")
