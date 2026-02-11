@@ -1,72 +1,43 @@
-from abc import ABCMeta, abstractmethod
 import logging
-import threading
+from core.singleton_meta import SingletonMeta
+from interfaces.i_logger_interface import ILogger
 
 
-class SingletonMeta(metaclass=ABCMeta):
-    _instance = {}
-    _lock = threading.Lock()
+class Logger(ILogger, metaclass=SingletonMeta):
+    """
+    Logger singleton per name.
 
-    def __call__(cls, *args, **kwargs):
-        with cls._lock:
-            if cls not in cls._instance:
-                cls._instance[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
-        return cls._instance[cls]
+    Provides a single logger instance per class name or custom name.
+    Supports both console and file logging with standard formatting.
+    """
 
-
-class BaseLogger(SingletonMeta):
-    @abstractmethod
-    def debug(cls, message: str):
-        pass
-
-    @abstractmethod
-    def info(cls, message: str):
-        pass
-
-    @abstractmethod
-    def debug(cls, message: str):
-        pass
-
-    @abstractmethod
-    def warning(cls, message: str):
-        pass
-
-    @abstractmethod
-    def error(cls, message: str):
-        pass
-
-    @abstractmethod
-    def critical(cls, message: str):
-        pass
-
-
-class Logger(BaseLogger):
-
-    def __init__(self, name="Singleton_Logger"):
-        # Set up the logger
-        print("Initializing logger")
+    def __init__(self, name: str = "Singleton_Logger"):
+        # Create or get a logger with the specified name
         self._logger = logging.getLogger(name)
-        self._logger.setLevel(logging.DEBUG)
+        self._logger.setLevel(logging.DEBUG)  # Capture all levels
 
-        # Create file handler and set its level to DEBUG
-        file_handler = logging.FileHandler("basic_file.log")
-        file_handler.setLevel(logging.DEBUG)
+        # Only add handlers once to avoid duplicates
+        if not self._logger.hasHandlers():
+            # logs all DEBUG and messages to a file
+            file_handler = logging.FileHandler("logs.log")
+            file_handler.setLevel(logging.DEBUG)
 
-        # Create a console handler and set its level to INFO
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
+            # logs INFO and messages to the console
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
 
-        # Create formater and add it to both handlers
-        formater = logging.Formatter(
-             "%(asctime)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s"
-        )
-        file_handler.setFormatter(formater)
-        console_handler.setFormatter(formater)
+            # Define log message format
+            formatter = logging.Formatter(
+                "%(asctime)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s"
+            )
+            file_handler.setFormatter(formatter)
+            console_handler.setFormatter(formatter)
 
-        # Add the handlers to the logger
-        self._logger.addHandler(file_handler)
-        self._logger.addHandler(console_handler)
+            # Add handlers to logger
+            self._logger.addHandler(file_handler)
+            self._logger.addHandler(console_handler)
 
+    # Logging methods with stacklevel 2 to show correct caller
     def debug(self, message: str):
         self._logger.debug(message, stacklevel=2)
 
