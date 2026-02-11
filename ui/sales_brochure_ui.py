@@ -1,5 +1,6 @@
-import streamlit as st
 import time
+
+import streamlit as st
 
 st.title("📚 LLM Powered Sales Brochure")
 st.markdown("<br>", unsafe_allow_html=True)
@@ -18,7 +19,9 @@ textword = (
 st.markdown("### 📌 Input Details")
 
 with st.form("my_form"):
-    text = st.text_input("🛍️ What product or service do you want to create a sales brochure for?")
+    text = st.text_input(
+        "🛍️ What product or service do you want to create a sales brochure for?"
+    )
     submit = st.form_submit_button("🚀 Generate Brochure")
 
     if submit:

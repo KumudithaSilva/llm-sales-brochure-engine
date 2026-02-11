@@ -1,5 +1,6 @@
-from abc import ABCMeta
 import threading
+from abc import ABCMeta
+
 
 class SingletonMeta(ABCMeta):
     """
@@ -9,6 +10,7 @@ class SingletonMeta(ABCMeta):
     only one instance of the class is created. Thread-safe to avoid
     race conditions in multi-threaded environments.
     """
+
     _instance = {}  # Stores instances keyed by name
     _lock = threading.Lock()  # Ensures thread safety
 
