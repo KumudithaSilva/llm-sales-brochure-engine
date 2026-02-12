@@ -1,6 +1,5 @@
-import time
-
 import streamlit as st
+import requests
 
 st.title("📚 LLM Powered Sales Brochure")
 st.markdown("<br>", unsafe_allow_html=True)
@@ -29,5 +28,19 @@ with st.form("my_form"):
             st.error("⚠️ Please enter a product or service.")
         else:
             with st.spinner("⏳ Generating your sales brochure..."):
-                time.sleep(2)
-                st.write(f"📝 Example brochure content:\n\n{textword}")
+                try:
+                    response = requests.post(
+                        "http://localhost:8000/fetch_links",
+                        json={"base_url": text},
+                    )
+                    if response.status_code == 200:
+                        data = response.json()
+                        links = data.get("links", [])
+                        st.write(f"📝 Example brochure content:\n\n{links}")
+                    else:
+                        st.error(f"❌ Failed to fetch links: {response.text}")
+                except Exception as e:
+                    st.error(f"❌ An error occurred: {str(e)}")
+                    st.stop()
+
+# streamlit run sales_brochure_ui.py
