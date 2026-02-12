@@ -1,5 +1,5 @@
-import streamlit as st
 import requests
+import streamlit as st
 
 st.title("📚 LLM Powered Sales Brochure")
 st.markdown("<br>", unsafe_allow_html=True)
