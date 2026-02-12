@@ -30,7 +30,7 @@ with st.form("my_form"):
             with st.spinner("⏳ Generating your sales brochure..."):
                 try:
                     response = requests.post(
-                        "http://localhost:8000/fetch_links",
+                        "http://localhost:8000/generate_prompt",
                         json={"base_url": text},
                     )
                     if response.status_code == 200:
