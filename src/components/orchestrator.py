@@ -1,62 +1,65 @@
 from typing import List, Optional
 
-from infrastructure.dotenv import DotEnvLoader
-from infrastructure.openai_provider import OpenAIApiKeyProvider
-from infrastructure.openai_service import OpenAIService
-from infrastructure.playwright_scraper import PlaywrightWebScraper
-from infrastructure.prompt import PromptProvider
+from interfaces.i_oneshot_prompt import IPrompt
+from interfaces.i_openai_operations import IOpenAIOperations
+from interfaces.i_sales_orchestrator import ISalesBrochureOrchestrator
+from interfaces.i_scraper import IScraperProvider
 
 
-class SalesBrochureOrchestrator:
+class SalesBrochureOrchestrator(ISalesBrochureOrchestrator):
     """
-    Orchestrates the process of scraping website links and filtering
-    them using OpenAI's API for relevance.
+    Orchestrates scraping and AI processing using interface-based dependencies.
 
     Attributes:
-        env_loader (DotEnvLoader): Loads environment variables.
-        key_provider (OpenAIApiKeyProvider): Provides OpenAI API key.
-        playwright_scraper (Optional[PlaywrightWebScraper]): Scraper instance.
-        prompt_provider (Optional[PromptProvider]): Provides prompts for OpenAI.
-        base_url (Optional[str]): The base URL to scrape.
-        links (list): All links fetched from the base URL.
+        playwright_scraper (IScraperProvider): Interface for web scraping.
+        prompt_provider (IPrompt): Interface for prompt generation.
+        openai_service (IOpenAIOperations): Interface for OpenAI operations.
+        content (Optional[str]): Scraped content.
+        base_url (Optional[str]): Base URL to scrape.
+        links (Optional[List[str]]): All links fetched from the website.
     """
 
-    def __init__(self):
-        """Initialize the orchestrator with environment loader and API key provider."""
-        self.env_loader = DotEnvLoader()
-        self.key_provider = OpenAIApiKeyProvider(self.env_loader)
+    def __init__(
+        self,
+        playwright_scraper: IScraperProvider,
+        prompt_provider: IPrompt,
+        openai_service: IOpenAIOperations,
+    ):
+        self.playwright_scraper = playwright_scraper
+        self.prompt_provider = prompt_provider
+        self.openai_service = openai_service
 
-        self.playwright_scraper: Optional[PlaywrightWebScraper] = None
-        self.prompt_provider: Optional[PromptProvider] = None
-
+        self.content: Optional[str] = None
         self.base_url: Optional[str] = None
-        self.links: list = []
+        self.links: Optional[List[str]] = None
 
-    def orchestrate(self, base_url: str) -> List[str]:
+    def orchestrate(self, base_url: str) -> str:
         """
-        Main orchestration method: fetch links from the website and
-        select relevant links via OpenAI.
-
-        Steps:
-            1. Initialize the Playwright scraper with the base URL.
-            2. Fetch all internal links from the website.
-            3. Initialize PromptProvider if not already created.
-            4. Call OpenAIService to select relevant links.
+        Fetch content and links from a website, select relevant links,
+        and generate a company brochure.
 
         Args:
             base_url (str): The website URL.
 
         Returns:
-            List[str]: A list of relevant links identified by OpenAI.
+            str: Generated company brochure.
         """
         self.base_url = base_url
-        self.playwright_scraper = PlaywrightWebScraper(base_url=self.base_url)
+        self.playwright_scraper.base_url = base_url
+
+        # Fetch content and links
+        self.content = self.playwright_scraper.fetch_content()
         self.links = self.playwright_scraper.fetch_links()
 
-        if self.prompt_provider is None:
-            self.prompt_provider = PromptProvider()
-        openai_service = OpenAIService(
-            self.key_provider, self.prompt_provider, self.base_url, self.links
+        # Select relevant links
+        relevant_links = self.openai_service.select_relevant_links(base_url, self.links)
+        links_text = "\n".join(relevant_links)
+
+        # Generate company brochure
+        brochure = self.openai_service.create_brochure(
+            company_name="HuggingFace",
+            contents=self.content,
+            relevent_links=links_text,
         )
-        relevant_links = openai_service.select_relevant_links()
-        return relevant_links
+
+        return brochure
