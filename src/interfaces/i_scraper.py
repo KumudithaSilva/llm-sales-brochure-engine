@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple
+from typing import List
 
 
 class IScraperProvider(ABC):
@@ -10,6 +10,6 @@ class IScraperProvider(ABC):
         pass
 
     @abstractmethod
-    def fetch_content(self) -> Tuple[str, str]:
+    def fetch_content(self) -> str:
         """Return the page title and main content."""
         pass
