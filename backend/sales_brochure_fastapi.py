@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from components.orchestrator import SalesBrochureOrchestrator
+from container.salesbrochure_container import SalesBrochureContainer
 
 app = FastAPI(title="LLM Sales Brochure API")
 
@@ -26,13 +26,12 @@ def get_links(data: URLRequest):
         data (URLRequest): Contains the base_url to scrape.
 
     Returns:
-        dict: Contains list of relevant links or an error message.
+        dict: Contains company brochure details.
     """
-    sb = SalesBrochureOrchestrator()
-
     try:
-        links = sb.orchestrate(data.base_url)
-        return {"links": links}
+        orchestrator = SalesBrochureContainer.create_orchestrator(data.base_url)
+        company_brochure = orchestrator.orchestrate(data.base_url)
+        return {"company_brochure": company_brochure}
 
     except Exception as e:
         # Raise HTTPException to return proper HTTP status code (500)
