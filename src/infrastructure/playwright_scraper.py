@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -33,7 +33,7 @@ class PlaywrightWebScraper(IScraperProvider):
         self.logger = logger or Logger(self.__class__.__name__)
         self.base_url = base_url
         self.links: List[str] = []
-        self.content: List[str] = []
+        self.content: Optional[str] = None
 
     def fetch_links(self) -> List[str]:
         """
@@ -88,12 +88,12 @@ class PlaywrightWebScraper(IScraperProvider):
         self.links = list(links)
         return list(links)
 
-    def fetch_content(self) -> List[str]:
+    def fetch_content(self) -> str:
         """
         Extract all main text content from the webpage.
 
         Returns:
-            List[str]: A list of text paragraphs extracted from the page.
+            str: Text paragraphs extracted from the page.
         """
         paragraphs = []
         self.logger.info(f"Fetching content from: {self.base_url}")
@@ -127,5 +127,5 @@ class PlaywrightWebScraper(IScraperProvider):
                         self.logger.warning("Found empty paragraph tag, skipping.")
         except Exception as e:
             self.logger.error(f"Error fetching content: {e}")
-        self.content = paragraphs
-        return paragraphs
+        self.content = "\n\n".join(paragraphs)
+        return self.content
