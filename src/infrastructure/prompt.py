@@ -58,3 +58,32 @@ class PromptProvider(IPrompt):
 
         """
         return user_prompt
+
+    def brochure_system_prompt(self) -> str:
+        """
+        Get the brochure system prompt.
+
+        Returns:
+            str: The system brochure prompt string.
+        """
+        brochure_system_prompt = """
+        You are an assistant that analyzes the contents of several relevant pages from a company website
+        and creates a short brochure about the company for prospective customers, investors and recruits.
+        Respond in markdown without code blocks.
+        Include details of company culture, customers and careers/jobs if you have the information.
+        """
+        return brochure_system_prompt
+
+    def brochure_user_prompt(self, company_name: str, contents: str, links: str) -> str:
+        """
+        Get the brochure user prompt.
+
+        Returns:
+            str: The user brochure prompt string.
+        """
+        user_prompt = f"""
+        You are looking at a company called: {company_name}
+        Here are the contents of its landing page:{contents}
+        Here are the other relevant pages / links: {links}
+        Use this information to build a short brochure of the company in markdown without code blocks."""
+        return user_prompt
