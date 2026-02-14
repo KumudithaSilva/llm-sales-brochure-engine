@@ -84,7 +84,7 @@ This system follows senior-level software engineering practices:
 
 ## 📸 Sales Brochure App Output (UI Preview)
 
-<img width="500" height="384" alt="image" src="https://github.com/user-attachments/assets"/>
+<img width="500" height="900" alt="image" src="https://github.com/user-attachments/assets/24ac4975-5cb9-4d7d-bd2b-9fae2e3d06d9"/>
 
 
 ## 📌 How It Works
